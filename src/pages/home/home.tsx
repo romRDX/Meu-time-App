@@ -1,52 +1,60 @@
-import React, { useState, useEffect } from 'react';
-import UserItem from '../../components/userItem/userItem';
+import React, { useState } from 'react';
 import styles from "./home.module.scss";
-import { useUsers } from "../../hooks/useAuth";
-import Pagination from '../../components/pagination/pagination';
-import SearchInput from '../../components/searchInput/searchInput';
 import { useFootballApi } from '../../hooks/useFootballAPI';
-import Header from '../../components/header/header';
-
-interface Country {
-  code: string,
-  flag: string,
-  name: string,
-}
+import { useAuth } from '../../hooks/useAuth';
+import { useNavigate } from "react-router-dom";
 
 const Home = () => {
 
   const client = useFootballApi();
+  const { setUserKey } = useAuth();
+  const navigate = useNavigate();
 
-  const [countries, setCountries] = useState<Country[]>([]);
-  const [selectedCountry, setSelectedCountry] = useState<Country>();
+  const [keyInput, setKeyInput] = useState("");
+  const [keyError, setKeyError] = useState<boolean>(false);
 
-  // useEffect(() => {
-  //   client("countries").then((res) => {
-  //     console.log("XXX: ", res);
-  //     setCountries(res.response);
-  //   })
-  // }, []);
+  const handleLogin = () => {
+    
+    if(keyInput){
+      client("countries", keyInput).then((res) => {
+
+        if(res.errors.length === 0){
+          console.log("FOI");
+          setUserKey(keyInput);
+          navigate("/times", { state: { countries: res.response} });
+        } else {
+          setKeyError(true);
+          setKeyInput("");
+        }
+      })
+    }
+  }
+
+  const handleOnChange = (element: HTMLInputElement) => {
+    if(keyError){
+      setKeyError(false);
+    }
+
+    setKeyInput(element.value)
+  }
 
   return (
     <div className={styles.home}>
-      <Header />
-        <aside className={styles.home__menu}>
-          
+      <h1>Bem vindo ao Meu Time, seu site de dados e informações sobre futebol!</h1>
 
-          <h1>Bem vindo ao Meu Time, seu site de dados e informações sobre futebol!</h1>
-          <select name="countries" onChange={(e) => console.log("HHH: ", e.target.value)}>
-            {
-              countries?.map((country) => (
-                <option value={country.name} key={country.code}>
-                  <p>{country.name}/{country.code}</p>
-                  <div>
-                    <img src={country.flag} alt={`${country.name}-flag`} width="200" height="200" />
-                  </div>
-                </option>
-              ))
-            }
-          </select>
-        </aside>
+      <div className={styles.home__login}>
+        <h2>Faça login para acessar os nosso dados.</h2>
+        
+        <label htmlFor='user-key' >Chave de acesso: </label>
+        <input value={keyInput} onChange={(e) => handleOnChange(e.target)} id='user-key' />
+        <button onClick={handleLogin}>Fazer login</button>
+        {
+          keyError &&        
+          <div className={styles.home__error}>
+            <p>Erro nas credenciais, por favor, insira uma chave de acesso válida.</p>
+          </div>
+        }
+      </div>
     </div>
   );
 }

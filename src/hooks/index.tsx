@@ -1,14 +1,14 @@
 import React from 'react';
-import { UsersAPIProvider } from "./useAuth";
+import { AuthProvider } from "./useAuth";
 
 type Props = {
   children?: React.ReactNode
 };
 
 const AppProvider: React.FC<Props> = ({ children }) => (
-  <UsersAPIProvider>
+  <AuthProvider>
     {children}
-  </UsersAPIProvider>
+  </AuthProvider>
 );
 
 export default AppProvider;
