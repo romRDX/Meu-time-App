@@ -1,59 +1,43 @@
 
 .teams {
   display: flex;
+  flex-direction: column;
   justify-content: center;
   padding-top: 20px;
   
-  &__team-selection {
+  &__selection-container {
     display: flex;
     justify-content: center;
-
-    > div {
-      height: 105px;
-      box-sizing: border-box;
-      border: 2px solid black;
-      padding: 15px;
-      display: flex;
-      flex-direction: column;
-      position: relative;
-      overflow: hidden;
-
-      select {
-        margin: 10px auto 0;
-        background: white;
-        border-radius: 10px;
-        padding: 12px;
-        width: 200px;
-        box-shadow: inset 0 0 4px 0px black;
-
-        option {
-          
-        }
-      }
-
-      div {
-        top: -105px;
-        left: 0;
-        right: 0;
-        position: absolute;
-        height: 100%;
-        width: 100%;
-        background: red;
-        width: inherit;
-        box-sizing: border-box;
-        border: 2px solid black;
-        padding: 15px;
-        display: flex;
-
-        &.open {
-          top: 0;
-        }
-
-        h2 {
-          font-size: 25px;
-        }
-      }
-    }
+    position: relative;
   }
 
+  &__go-back-button {
+    border-top-left-radius: 10px;
+    border-bottom-left-radius: 10px;
+    border: 1px solid black;
+    padding: 10px;
+    height: fit-content;
+    margin: auto 0;
+    font-size: 24px;
+    font-weight: bold;
+    cursor: pointer;
+  }
+  
+  &__selection-item {
+    height: 105px;
+    box-sizing: border-box;
+    border: 2px solid black;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+
+    select {
+      margin: 10px auto 0;
+      background: white;
+      border-radius: 10px;
+      padding: 12px;
+      width: 200px;
+      box-shadow: inset 0 0 4px 0px gray;
+    }
+  }
 }
