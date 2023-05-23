@@ -40,4 +40,102 @@
       box-shadow: inset 0 0 4px 0px gray;
     }
   }
+
+  &__team-data-container {
+    display: flex;
+    flex-direction: column;
+    max-width: 900px;
+    margin: 50px auto;
+
+    &__team-info {
+      display: flex;
+      
+      h1 {
+        margin: auto 20px auto 0;
+        font-size: 44px;
+      }
+
+      img {
+        width: 200px;
+      }
+    }
+
+    &__players {
+      display: flex;
+      flex-direction: column;
+
+      h2 {
+        font-size: 24px;
+        margin-top: 20px;
+      }
+
+      ul {
+        display: flex;
+        margin: 20px 0 40px;
+        overflow-x: scroll;
+        border: 1px solid lightgray;
+
+        li {
+          display: flex;
+          margin: 10px 5px;
+          padding: 10px;
+          width: 395px;
+          box-sizing: border-box;
+          border: 1px solid lightgray;
+
+          div {
+            margin-left: 8px;
+            border-left: 1px solid gray;
+            padding-left: 8px;
+
+            p {
+              font-size: 22px;
+              margin-bottom: 5px;
+            }
+          }
+        }
+      }
+    }
+
+    &__lineups {
+
+      margin: 10px 0;
+      display: flex;
+      line-height: 30px;
+      
+      h2 {
+        font-size: 30px;
+        font-weight: bold;
+        margin-right: 20px;
+      }
+
+      p {
+        font-size: 24px;
+      }
+    }
+
+    &__results {
+
+      margin: 10px 0;
+
+      h2 {
+        font-size: 30px;
+        font-weight: bold;
+        margin-bottom: 15px;
+      }
+
+      div {
+        display: flex;
+        justify-content: center;
+        
+        p {
+          font-size: 24px;
+          margin: 0 8px;
+          padding: 10px;
+          border: 1px solid black;
+          border-radius: 10px;
+        }
+      }
+    }
+  }
 }

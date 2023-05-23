@@ -54,3 +54,27 @@ export interface Team {
         surface: string,
     }
 }
+interface Fixutres {
+    played: { total: number },
+    draws: { total: number },
+    loses: { total: number },
+    wins: { total: number },
+}
+interface FormationData {
+    formation: string,
+    played: number,
+}
+export interface Statistics {
+    fixtures: Fixutres,
+    lineups: FormationData[],
+    goals: {
+        for: {
+            minute: {
+                [data: string]: {
+                    total: number,
+                    percentage: string,
+                }
+            }
+        }
+    }
+}

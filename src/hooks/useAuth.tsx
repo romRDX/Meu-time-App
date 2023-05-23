@@ -12,7 +12,7 @@ type Props = {
 const AuthContext = createContext<AuthContextData>({} as AuthContextData);
 
 export const AuthProvider: React.FC<Props> = ({ children }) => {
-  const [userKey, setUserKey] = useState<string>("");
+  const [userKey, setUserKey] = useState<string>("7e6e2e5db244131a8974e1dd8d6726b5");
 
   return (
     <AuthContext.Provider

@@ -3,9 +3,10 @@ import styles from "./teams.module.scss";
 
 import { useFootballApi } from '../../hooks/useFootballAPI';
 import {useLocation} from 'react-router-dom';
-import { Country, League, Season, Team } from '../../types';
+import { Country, League, Season, Team, Statistics } from '../../types';
 import CustomSelect from '../../components/customSelect/customSelect';
 import { format } from "date-fns";
+import { LineChart, Line, CartesianGrid, XAxis, YAxis } from 'recharts';
 
 interface SelectedData {
   country: Country | null,
@@ -29,6 +30,8 @@ const Home = () => {
   const [seasons, setSeasons] = useState<Season[]>();
   const [leagues, setLeagues] = useState<LeaguesData[]>([]);
   const [teams, setTeams] = useState<Team[]>();
+  const [players, setPlayers] = useState<any[]>();
+  const [statistics, setStatistics] = useState<Statistics>();
 
   const [selectedData, setSelectedData] = useState<SelectedData>({
     country: null,
@@ -59,9 +62,31 @@ const Home = () => {
   useEffect(() => {
     if(selectedData.country && selectedData.league && selectedData.season && !teams){
       client(`teams?league=${selectedData.league.id}&season=${selectedData.season.year}`).then((res) => {
-        console.log("XXX: ", res);
+        
         if(res.errors.length === 0){
           setTeams(res.response);
+        } else {
+
+        }
+      })
+    }
+  }, [selectedData]);
+
+  useEffect(() => {
+    if(selectedData.country && selectedData.league && selectedData.season && selectedData.team){
+      client(`players?team=${selectedData.team.team.id}&season=${selectedData.season.year}`).then((res) => {
+        console.log("PLAYERS: ", res);
+        if(res.errors.length === 0){
+          setPlayers(res.response);
+        } else {
+
+        }
+      })
+
+      client(`/teams/statistics?team=${selectedData.team.team.id}&season=${selectedData.season.year}&league=${selectedData.league.id}`).then((res) => {
+        console.log("STATISTICS: ", res);
+        if(res.errors.length === 0){
+          setStatistics(res.response);
         } else {
 
         }
@@ -104,7 +129,32 @@ const Home = () => {
     }
   };
 
-  console.log("AWS: ", teams);
+  const monstUsedLineups = () => {
+    if(statistics && statistics.lineups.length > 0){
+      const mostUsedLineup = statistics.lineups?.reduce((prev, current) => (prev.played > current.played) ? prev : current);
+      return mostUsedLineup.formation;
+    } else {
+      return "";
+    }
+  }
+
+  const renderLineChart = () => {
+
+    const x = Object(statistics?.goals.for.minute).entries();
+    console.log("XXX: ", x);
+
+    return (
+      <LineChart width={400} height={400} data={[{name: 'Page A', uv: 400 }, { name: "Pabe B", uv: 200 }]}>
+        <Line type="monotone" dataKey="uv" stroke="#8884d8" />
+        <CartesianGrid stroke="#ccc" />
+        <XAxis dataKey="name" />
+        <YAxis />
+      </LineChart>
+    )
+  }
+
+
+  console.log("AWS: ", statistics);
 
   return (
     <div className={styles.teams}>
@@ -116,8 +166,8 @@ const Home = () => {
             dataName='País'
             resultContent={
               <>
-                <p>{ selectedData.country && selectedData.country?.name }</p>
-                <img src={ selectedData.country ? selectedData.country?.flag : "" } alt={`${'text'} flag`} />
+                <p>{ selectedData.country && selectedData.country.name }</p>
+                <img src={ selectedData.country ? selectedData.country.flag : "" } alt={`${selectedData.country?.name} flag`} />
               </>
             }
           >
@@ -136,7 +186,7 @@ const Home = () => {
             resultContent={
               <>
                 <p>{ selectedData.league && selectedData.league.name }</p>
-                <img src={ selectedData.league ? selectedData.league.logo : "" } alt={`${'text'} flag`} />
+                <img src={ selectedData.league ? selectedData.league.logo : "" } alt={`${selectedData.league?.name} flag`} />
               </>
             }
           >
@@ -163,8 +213,6 @@ const Home = () => {
             dataName='Temporada'
             resultContent={
               <>
-                {/* { selectedData.season && <p style={{ fontSize: "18px" }}>{ format(new Date(selectedData.season.start), "dd/LL/yyyy - ") }</p>}
-                { selectedData.season && <p style={{ fontSize: "18px" }}>{ format(new Date(selectedData.season.end), "- dd/LL/yyyy") }</p>} */}
                 { selectedData.season && <p>{ format(new Date(selectedData.season.end), "yyyy") }</p>}
               </>
             }
@@ -172,8 +220,6 @@ const Home = () => {
             {
               seasons && seasons.map((season) => (
                 <li key={season.start} onClick={() => handleChangeState(season, "season")}>
-                  {/* <p>{ format(new Date(season.start), "dd/LL/yyyy") }</p> */}
-                  {/* <p>{ format(new Date(season.end), "dd/LL/yyyy") }</p> */}
                   <p>{ format(new Date(season.start), "yyyy") }</p>
                 </li>
               ))
@@ -188,7 +234,7 @@ const Home = () => {
             resultContent={
               <>
                 <p>{ selectedData.team && selectedData.team.team.name }</p>
-                <img src={ selectedData.team ? selectedData.team.team.logo : "" } alt={`${'text'} flag`} />
+                <img src={ selectedData.team ? selectedData.team.team.logo : "" } alt={`${selectedData.team?.team.name} flag`} />
               </>
             }
           >
@@ -208,7 +254,54 @@ const Home = () => {
           </CustomSelect>
         </div>
       </div>
-      <div>teste</div>
+
+      { selectedData.team &&
+        <div className={styles['teams__team-data-container']}>
+          <div className={styles['teams__team-data-container__team-info']}>
+            <h1>{selectedData.team?.team.name}</h1>
+            <img src={ selectedData.team ? selectedData.team.team.logo : "" } alt={`${selectedData.team?.team.name} flag`} />
+          </div>
+
+          <div className={styles['teams__team-data-container__players']}>
+            <h2>Jogadores</h2>
+            <ul>
+              {
+                players && players.map((player) => (
+                  <li key={player.player.id}>
+                    <img src={player.player.photo} alt={`${player.player.name}`} />
+                    <div>
+                      <p>{player.player.name}</p>
+                      <p>Idade: {player.player.age}</p>
+                      <p>Nacionalidade: {player.player.nationality}</p>
+                    </div>
+                  </li>
+                ))
+              }
+              
+            </ul>
+          </div>
+
+          <div className={styles['teams__team-data-container__lineups']}>
+            <h2>Formação mais utilizada na temporada:</h2>
+            <p>{ monstUsedLineups() }</p>
+          </div>
+
+          <div className={styles['teams__team-data-container__results']}>
+            <h2>Resultados</h2>
+            <div>
+              <p>Jogos: {statistics?.fixtures.played.total}</p>
+              <p>Vitórias: {statistics?.fixtures.wins.total}</p>
+              <p>Derrotas: {statistics?.fixtures.loses.total}</p>
+              <p>Empates: {statistics?.fixtures.draws.total}</p>
+            </div>
+          </div>
+
+          <div>
+            <h2>Gols por tempo de jogo</h2>
+            { renderLineChart() }
+          </div>
+        </div>
+      }
     </div>
   );
 }
